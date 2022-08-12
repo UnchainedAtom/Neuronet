@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} PROFILE {% endblock %}
+{% block content %}
+    <p>USER NAME: {{ user.userName }}<p>
+    <p>USER RATING: {{ user.userRating }}<p>
+
+    {% if user.isArtist %}
+        <p>ARTIST RATING: {{ artist.artistRating }} <p>
+    {% endif %}
+
+    <p>CREDITS: {{user.currentCredits }}</p>
+{% endblock %}

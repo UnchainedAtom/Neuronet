@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %} MARKET {% endblock %}
+{% block content %}
+    <table class="art-table">
+        <thead>
+            <tr>
+                <th scope="col">TITLE</th>
+                <th scope="col">LAST</th>
+                <th scope="col">PRICE</th>
+                <th scope="col">ARTIST</th>
+                <th scope="col">OWNER</th>
+                <th scope="col">ARTWORK</th>
+                <th scope="col"></th>
+            </tr>   
+        </thead>
+        <tbody>
+            {% for artwork in artworks %}
+                {% if artwork.forSale == True  %}
+                    <tr>
+                        <td scope="row">{{ artwork.artName }}</td>
+                        <td>{{ artwork.purchasePrice }}</td>
+                        <td>{{ artwork.currentPrice }}</td>
+                        <td>{{ artwork.artist.artistUser.userName }}</td>
+                        <td>{{ artwork.ownerUser.userName }}</td>
+                        <td><img src="{{ url_for('views.get_img', id=artwork.id)}}" class="art-image-thumbnail" ></td>
+                        {% if artwork.ownerUser.id != user.id %}
+                            <td><button type="button" class="btn btn-primary" onClick="buyArtwork({{ artwork.id }})" >[BUY]</button></td>
+                        {% endif %}
+
+                    </tr>
+                {% endif %}
+                
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
