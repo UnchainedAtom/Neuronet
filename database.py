@@ -1,3 +1,4 @@
+from tkinter.tix import COLUMN
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
@@ -15,6 +16,7 @@ class User(db.Model, UserMixin):
     isAdmin = db.Column(db.Boolean, default=False)
     ownedArt = db.relationship('Artwork', backref='ownerUser')
     artistInfo = db.relationship('Artist', backref='artistUser')
+    websiteRoles = db.relationship('WebsiteRole', backref='roleUser')
     
 class Artwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,5 +55,17 @@ class endDayLog(db.Model):
 class fellCodes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15), nullable=False)
-    
+
+
+class Website(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    websiteName = db.Column(db.String(30), nullable=False) 
+
+
+class WebsiteRole(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    website_id = db.Column(db.Integer, db.ForeignKey('website.id'))
+    website = db.relationship('Website')
+    role = db.Column(db.String(30), nullable=False) 
 
