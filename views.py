@@ -1,5 +1,5 @@
 from flask import Blueprint, Response, render_template, request, Response, jsonify, redirect, url_for,session, flash
-from .database import db, User, Artist, Artwork, endDayLog, vDate, fellCodes
+from .database import db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
@@ -19,16 +19,18 @@ views = Blueprint('views', __name__)
 @views.route("/")
 @login_required
 def home():
-    return render_template("home.html", user=current_user)
+    return render_template("home.html", user=current_user, roles = getAllUserRoles())
 
 @views.route("/profile")
 @login_required
 def profile():
-    if current_user.isArtist:
-        artistUser = db.session.query(User, Artist).join(Artist).filter(User.id == current_user.id).first()
-        return render_template("profile.html", user=current_user, artist=artistUser[1])
 
-    return render_template("profile.html", user=current_user)
+    isArtist = hasUserRole(current_user,'FELLARTIST')
+    print(isArtist)
+    if (isArtist):
+        return render_template("profile.html", user=current_user, roles = getAllUserRoles())
+
+    return render_template("profile.html", user=current_user, roles = getAllUserRoles())
 
 #BIG ONE, NEEDS BUY FUNCTION, AND DISPLAY
 @views.route("/market")
@@ -37,13 +39,12 @@ def market():
 
     artworks=db.session.query(Artwork)
 
-    return render_template("market.html", user=current_user, artworks=artworks)
+    return render_template("market.html", user=current_user, roles = getAllUserRoles(), artworks=artworks)
 
 #NEEDS TO SHOW WHAT USERS OWN, AND ADD SELL FUNCTION
 @views.route("/inventory")
 @login_required
 def inventory():
-
     """#GOOD TEST EXAMPLES OF MODEL TRAVERSAL
     for art in current_user.ownedArt:
         print(art)
@@ -51,17 +52,18 @@ def inventory():
         print(art.artist.artistUser.userName)
     """
 
-    return render_template("inventory.html", user=current_user)
+    return render_template("inventory.html", user=current_user, roles = getAllUserRoles())
 
 #SHOULD BE ABLE TO CHANGE DATE AND MAYBE ADD EXTRA ADMIN FUNCTION PAGE IN HERE
 #added more securtiy, need to check if user is admin here as well
 @views.route("/myAdmin")
 @login_required
 def myAdmin():
-    if current_user.isAdmin:
+    isAdmin = hasUserRole(current_user,'ADMIN')
+    if isAdmin:
 
         currentDate = vDate.query.get('1')
-        return render_template("myAdmin.html", user=current_user, currentDate = currentDate)
+        return render_template("myAdmin.html", user=current_user, roles = getAllUserRoles(), currentDate = currentDate)
 
     return redirect(url_for('views.home'))
 
@@ -73,7 +75,7 @@ def artist():
     #deals with artwork upload
     if request.method == 'POST':
         
-        artistUser = db.session.query(User, Artist).join(Artist).filter(User.id == current_user.id).first()
+        artistUser = current_user
 
         artImage = request.files['artImage']
         artName = request.form.get('artName')
@@ -90,7 +92,7 @@ def artist():
             mimetype = artImage.mimetype
 
             #makes the image to be submitted to the database
-            img = Artwork(artName=artName, artImage=artImage.read(), mimetype=mimetype, currentPrice=artPrice, artist_id=artistUser[1].id, owner_user_id = current_user.id)
+            img = Artwork(artName=artName, artImage=artImage.read(), mimetype=mimetype, currentPrice=artPrice, artist_id=artistUser.id, owner_user_id = artistUser.id)
             db.session.add(img)
             db.session.commit()
 
@@ -102,9 +104,8 @@ def artist():
             return redirect(url_for('views.artist'))
 
     #loads page for artist
-    if current_user.isArtist:
-        artistUser = db.session.query(User, Artist).join(Artist).filter(User.id == current_user.id).first()
-        return render_template("artist.html", user=current_user, artist=artistUser[1])
+    if hasUserRole(current_user,'FELLARTIST'):
+        return render_template("artist.html", user=current_user, roles = getAllUserRoles())
 
     return redirect(url_for('views.home'))
 
@@ -124,14 +125,11 @@ def sell_artwork():
     artwork = json.loads(request.data)
     artworkId = artwork['artworkId']
     artwork = Artwork.query.get(artworkId)
-    fellowshipMarket = User.query.get('1')
-    uCredits = current_user.currentCredits
-    artPrice = artwork.currentPrice
 
     #adds credits to user based on price of artwork when sold
     #artwork is now owned by Fellowship Market, and no longer belongs to user
     if artwork:
-        if artwork.owner_user_id == current_user.id:
+        if artwork.ownerUser.id == current_user.id:
             #current_user.currentCredits = uCredits+artPrice
             #artwork.owner_user_id = fellowshipMarket.id
             #artwork.purchasePrice = artPrice
@@ -149,13 +147,11 @@ def buy_artwork():
     artwork = Artwork.query.get(artworkId)
     artist=artwork.artist
 
-    #get currentOwner ID
+    #get currentOwner
     currentOwner=artwork.ownerUser
 
-
-
     if artwork:
-        if artwork.owner_user_id != current_user.id:
+        if currentOwner.id != current_user.id:
 
             uCredits = current_user.currentCredits
             oCredits = currentOwner.currentCredits
@@ -166,6 +162,7 @@ def buy_artwork():
 
             #checks if user credits are greater than the price of the piece
             if uCredits >= artPrice:
+
                 current_user.currentCredits = uCredits-artPrice
 
                 #gives the current Owner of the art piece the credits
@@ -178,6 +175,24 @@ def buy_artwork():
                 artwork.owner_user_id = current_user.id
                 artwork.purchasePrice = artPrice
                 artwork.forSale = False
+                
+                #Log Transaction
+                currentDate = vDate.query.get('1')
+                iDate = currentDate.indexDate
+                wDate = str(currentDate.day) + ':' + str(currentDate.year)
+
+                #BUYER
+                balance = current_user.currentCredits
+                transaction = -abs(artPrice)                
+                buyLog = TransactionLog(user_id=current_user.id , worldDate=wDate, indexDate=iDate, balance=balance, transaction=transaction)
+                db.session.add(buyLog)
+
+                #SELLER
+                balance = currentOwner.currentCredits
+                transaction = abs(artPrice)
+                sellLog = TransactionLog(user_id=currentOwner.id , worldDate=wDate, indexDate=iDate, balance=balance, transaction=transaction)
+                db.session.add(sellLog)
+
                 db.session.commit()
             else:
                 flash('NOT ENOUGH CREDITS')
@@ -197,9 +212,6 @@ def next_day():
     artPrices = [a.currentPrice for a in db.session.query(Artwork.currentPrice)]
     artAvg = stats.trim_mean(artPrices, 0.2)
     maxArtPrice = (artAvg * 3) 
-    print(artPrices)
-    print(artAvg)
-    print()
 
     #Go through all artworks still for sale, and decided if they get bought
     for artwork in marketArt:
@@ -209,7 +221,15 @@ def next_day():
         buyArt=0
         currentOwner=artwork.ownerUser
         artist=artwork.artist
-        potentialBuyers=db.session.query(User).filter(User.isPlayer == False and User.id!=currentOwner.id).all()
+        restrictedBuyers=User.query.filter(User.websiteRoles.any( role = 'PLAYER' )).all()
+        restrictedBuyers.append(currentOwner)
+        allUsers = db.session.query(User).all()
+        print(restrictedBuyers)
+        print(allUsers)
+        potentialBuyers = set(allUsers) - set(restrictedBuyers)
+        print (potentialBuyers)
+        potentialBuyers = list(potentialBuyers)
+
         buyerListLen = (len(potentialBuyers)-1)
 
         if buyerListLen < 0:
@@ -218,20 +238,22 @@ def next_day():
         print(potentialBuyers)
 
         #Calculate artwork percent buy
-        percentBuy = (((currentOwner.userRating * .05) + (artist.artistRating * .25) + (artwork.artRating * .30) + ( (random.randint(1,100)) * .40))/100)
-        print(percentBuy)
+        percentBuy = (((currentOwner.userRating * .05) + (artist.artistRating * .15) + (artwork.artRating * .20) + ( (random.randint(1,100)) * .25) + (100 * .35))/100)
+        print('Percent BUY:' + str(percentBuy))
 
 
-        #TODO logic to evaluate if the artowrk is worth buying
+        #logic to evaluate if the artowrk is worth buying
         if artwork.currentPrice <= maxArtPrice and (random.random() < percentBuy):
             buyArt=1
             print('bought!')
             print()
 
-        #TODO if buy go through list of NPCs and randomly assign this to one.  Treat like an art buy
-        if buyArt==1 and buyerListLen > 0:
+        print('BUY LIST LEN' + str(buyerListLen))
+        #if buy go through list of NPCs and randomly assign this to one.  Treat like an art buy
+        if buyArt==1 and buyerListLen > -1:
 
             randomUser = potentialBuyers[(random.randint(0,buyerListLen))]
+            print(randomUser)
             
             
             if artwork:
@@ -255,12 +277,23 @@ def next_day():
                     artwork.purchasePrice = artPrice
                     artwork.forSale = True
 
+                    #Log Transaction
+                    currentDate = vDate.query.get('1')
+                    iDate = currentDate.indexDate
+                    wDate = str(currentDate.day) + ':' + str(currentDate.year)
+
+                    #SELLER
+                    balance = currentOwner.currentCredits
+                    transaction = abs(artPrice)
+                    sellLog = TransactionLog(user_id=currentOwner.id , worldDate=wDate, indexDate=iDate, balance=balance, transaction=transaction)
+                    db.session.add(sellLog)
+
 
         #if no buy, change for sale tag back to False.  User will have to decide to sell again for the next day
-        elif currentOwner.isPlayer == True:
+        elif hasUserRole(current_user, 'PLAYER') == True:
             artwork.forSale = False
 
-    #TODO Change Prices for the next day
+    #Change Prices for the next day
     
     #Go through every artwork and log the closing prices for the day
     logPrices(allArt)
@@ -334,9 +367,28 @@ def logPrices(allArt):
 
     return
 
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def hasUserRole(user,ROLE):
+    roleList=current_user.query.filter(User.websiteRoles.any( role = ROLE )).all()
+    if user in roleList:
+        
+        return True
+    else:
+        
+        return False
+
+def getAllUserRoles():
+    roles = []
+    for role in current_user.websiteRoles:
+        roles.append(role.role)
+    return roles
+
+
 
 
 # generate access code
@@ -344,7 +396,7 @@ def allowed_file(filename):
 @login_required
 def gen_code():
     genCode = (''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(15)))
-    addCode = fellCodes(code=genCode)
+    addCode = AccessCode(code=genCode)
     db.session.add(addCode)
     db.session.commit()
     return jsonify({})

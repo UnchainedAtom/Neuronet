@@ -4,8 +4,8 @@
     <p>USER NAME: {{ user.userName }}<p>
     <p>USER RATING: {{ user.userRating }}<p>
 
-    {% if user.isArtist %}
-        <p>ARTIST RATING: {{ artist.artistRating }} <p>
+    {% if 'FELLARTIST' in roles %}
+        <p>ARTIST RATING: {{ user.artistRating }} <p>
     {% endif %}
 
     <p>CREDITS: {{user.currentCredits }}</p>

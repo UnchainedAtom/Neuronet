@@ -2,15 +2,14 @@ from unicodedata import name
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
-from.database import db, fellCodes
-from .views import views
+from .database import Bill, NeuroxNode, Ship, System, TransactionLog, WebsiteRole, db, AccessCode, user_roles
+from .views import views, hasUserRole
 from .auth import auth
-from .database import db, DB_NAME, User, Artwork, Artist, vDate, endDayLog
+from .database import db, DB_NAME, User, Artwork, vDate, endDayLog,migrate
 from os import abort, path
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-
 
 
 def create_app():
@@ -22,6 +21,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.permanent_session_lifetime = timedelta(days=1)
     db.init_app(app)
+    migrate.init_app(app, db)
 
     #BLUEPRINTS
     app.register_blueprint(views, url_prefix="/")
@@ -41,7 +41,7 @@ def create_app():
         return User.query.get(int(id))
     
     admin = Admin(app, url='/admin', index_view=HomeAdminView(name='Home'))
-    admin.add_views(SecureModelView(User,db.session), SecureModelView(Artwork,db.session), SecureModelView(Artist,db.session), SecureModelView(vDate,db.session),SecureModelView(endDayLog,db.session), SecureModelView(fellCodes,db.session))
+    admin.add_views(SecureModelView(User,db.session), SecureModelView(Artwork,db.session), SecureModelView(vDate,db.session),SecureModelView(endDayLog,db.session), SecureModelView(WebsiteRole,db.session), SecureModelView(System,db.session), SecureModelView(TransactionLog,db.session), SecureModelView(Bill,db.session), SecureModelView(Ship,db.session), SecureModelView(NeuroxNode,db.session), SecureModelView(AccessCode,db.session))
 
         #INJECTING DATE
     @app.context_processor
@@ -64,7 +64,8 @@ class SecureModelView(ModelView):
     column_exclude_list = ('artImage')
 
     def is_accessible(self):
-        return current_user.isAdmin
+        return hasUserRole(current_user,'ADMIN')
+        # return current_user.isAdmin
     
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('views.home', next=request.url))
@@ -73,7 +74,7 @@ class SecureModelView(ModelView):
 class HomeAdminView(AdminIndexView):
 
     def is_accessible(self):
-        return current_user.isAdmin
+        return hasUserRole(current_user,'ADMIN')
     
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('views.home'))

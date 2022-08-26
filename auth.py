@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for,session, flash
-from .database import db, User, Artist, fellCodes
+from .database import db, User, AccessCode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 
@@ -46,7 +46,7 @@ def signUp():
         password2 = request.form.get('password2')
 
         #Verify access code exists in list of codes available 
-        exists = db.session.query(fellCodes.id).filter_by(code=code).first() is not None
+        exists = db.session.query(AccessCode.id).filter_by(code=code).first() is not None
         print(exists)
             
         #Query user from database
@@ -64,14 +64,11 @@ def signUp():
         else:
             new_user = User(userName=userName, password=generate_password_hash(password1, method='sha256'))
             #get code that was matched, so we can delete it 
-            matchCode = fellCodes.query.filter_by(code=code).first()
+            matchCode = AccessCode.query.filter_by(code=code).first()
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
             db.session.delete(matchCode)
-            #Generates artist record to connect to the user, but only turns it on if flag is set.  
-            artist = Artist(user_id = new_user.id, artistRating = 0.00)
-            db.session.add(artist)
             db.session.commit()
             flash('ACCOUNT CREATED.', category='success')
             return redirect(url_for('views.home'))

@@ -10,9 +10,9 @@
                         <p><img src="{{ url_for('views.get_img', id=artwork.id)}}" class="art-image-thumbnail" ></p>
                         <p>LAST: {{ artwork.purchasePrice }}</p>
                         <p>PRICE: {{ artwork.currentPrice }}</p>
-                        <p>ARTIST: {{ artwork.artist.artistUser.userName }}</p>
+                        <p>ARTIST: {{ artwork.artist.userName }}</p>
                         <p>OWNER: {{ artwork.ownerUser.userName }}</p>
-                        {% if artwork.ownerUser.id != user.id %}
+                        {% if artwork.ownerUser.id!= user.id %}
                             <p><button type="button" class="btn btn-primary" onClick="buyArtwork({{ artwork.id }})" >[BUY]</button></p>
                         {% endif %}
                     </div>

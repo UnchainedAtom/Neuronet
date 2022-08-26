@@ -50,19 +50,21 @@
                     <a class="nav-link" href="/auth/signUp">SIGN UP</a>
                 </li>
             {% endif %}
-            
+
             <!-- Check if user is Artist, and reveal artist page-->
-            {% if user.isArtist %}
-            <li class="nav-item">
-              <a class="nav-link" href="/artist">ARTIST</a>
+            {% if 'FELLARTIST' in roles %}
+              <li class="nav-item">
+                <a class="nav-link" href="/artist">ARTIST</a>
+              </li>
             {% endif %}
 
             <!-- Check if user is Admin, and reveal admin page-->
-            {% if user.isAdmin %}
-            <li class="nav-item">
-              <a class="nav-link" href="/myAdmin">ADMIN</a>
+            {% if 'ADMIN' in roles %}
+              <li class="nav-item">
+                <a class="nav-link" href="/myAdmin">ADMIN</a>
+              </li>
             {% endif %}
-          </li>
+            
         </ul>
       </nav>
 
