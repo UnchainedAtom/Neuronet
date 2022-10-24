@@ -2,29 +2,34 @@ from unicodedata import name
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
-from .database import Bill, NeuroxNode, Ship, System, TransactionLog, WebsiteRole, db, AccessCode, user_roles
-from .views import views, hasUserRole
+from .database import Bill, NeuroxNode, Ship, System, TransactionLog, WebsiteRole, db, AccessCode, DB_PASSWORD, User, Artwork, vDate, endDayLog, migrate
+from .fellViews import fellViews, hasUserRole
+from .neuroViews import neuroViews
 from .auth import auth
-from .database import db, DB_NAME, User, Artwork, vDate, endDayLog,migrate
 from os import abort, path
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+from urllib.parse import quote  
 
 
 def create_app():
     app = Flask(__name__)
     app.secret_key=('nonprod')
 
-    #DATABASE
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME
+    #OLD SQLlite DATABASE
+    #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME
+    #NEW MySql
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/AetherVoid' % quote(DB_PASSWORD)
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.permanent_session_lifetime = timedelta(days=1)
     db.init_app(app)
     migrate.init_app(app, db)
 
     #BLUEPRINTS
-    app.register_blueprint(views, url_prefix="/")
+    app.register_blueprint(fellViews, url_prefix="/fellowship/")
+    app.register_blueprint(neuroViews, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/auth/")
  
     #MAX UPLOAD SIZE 16MB
@@ -53,9 +58,9 @@ def create_app():
     return app
 
 def create_database(app):
-    if not path.exists(DB_NAME):
-        db.create_all(app=app)
-        print('CREATED DATABASE')
+    #if not path.exists(DB_NAME):
+    db.create_all(app=app)
+    print('CREATED DATABASE')
 
 
 

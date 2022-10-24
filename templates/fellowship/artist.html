@@ -1,0 +1,44 @@
+{% extends "fellowship/base.html" %}
+{% block title %} ARTIST {% endblock %}
+{% block content %}
+<form class="artist-form" action=" /artist" method="POST" enctype="multipart/form-data">
+    <h3 align="center"> </h3>
+    <div class="form-group">
+        <label for = "artName"> ARTWORK NAME </label>
+        <input
+            type="text"
+            class="form-control"
+            id="artName"
+            name="artName"
+            placeholder="ENTER ARTWORK NAME"
+        />
+    </div>
+
+    <div class="form-group">
+        <label for = "artPrice"> ARTWORK PRICE </label>
+        <input
+            type="number"
+            class="form-control"
+            id="artPrice"
+            name="artPrice"
+            min="1"
+            value="1"
+            step=".01"
+            placeholder="ENTER ARTWORK PRICE"
+        />
+    </div>
+
+
+    <div class="form-group">
+        <label for = "artImage" class="custom-file-upload">[UPLOAD IMAGE] </label>
+            <input
+                type="file"
+                class="form-control"
+                id="artImage"
+                name="artImage"
+            />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">[SUBMIT]</button>
+</form>
+{% endblock %}

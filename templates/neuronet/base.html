@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/neuronetStyling.css')}}">
+
+    
+
+
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  
+  <body>
+    
+    <div class="crt"></div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+          {% if category == 'error' %}
+
+          <div class="alert alert-danger alter-dismissable fade show" role="alert"> 
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert">
+                  <span aria-hidden="true">&times;</span>>
+              </button>
+          </div>
+
+          {% else %}
+
+          <div class="alert alert-success alter-dismissable fade show" role="alert"> 
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert">
+                  <span aria-hidden="true">&times;</span>>
+              </button>
+          </div>
+          {% endif %}
+
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+
+    <div class="container-fluid px-0">
+      <div class="content-border">
+
+        <div class="quickbarHeader">
+          <IMG class="profilePic" SRC="{{ url_for('static',filename='images/templateFace.png')}}">
+          <div class="contentQuickbarBorder">
+
+            <div class="hpItem" onClick="openPopup('#vitals')">
+              <div class="grid-item label">VITALS:</div>
+                <div class="grid-item value">
+                  <span id="quickCurrentHP"> {{user.currentHP + user.tmpHP}} </span>
+                  <span>/</span>
+                  {% if user.maxOverrideHP > 0 %}
+                    <span id="quickMaxHP">{{user.maxOverrideHP}}</span>
+                  {% else %}
+                    <span id="quickMaxHP">{{user.maxHP}}</span>
+                  {% endif %}
+                </div>
+            </div>
+
+
+          </div>
+          <div class="contentQuickbarBorder">
+            <div class="armorItem" onClick="openPopup('#AC')">
+              <div class="grid-item label">ARMOR:</div>
+              {% if user.overrideAC > 0 %}
+                <div class="grid-item value">OVER</div>
+              {% else %}
+                <div class="grid-item value">{{currentAC}}</div>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+
+        <div class="grid-container quickBar" onClick="openPopup('#quickBar')">
+          <div class="grid-item label">SPEED:</div>
+          <div class="grid-item label">INITIATIVE:</div>
+          <div class="grid-item label">PROFICIENCY:</div>
+
+          <div class="grid-item value">{{user.walkingSpeed}}</div>
+
+          {% if user.initOverride > 0 %}
+            <div class="grid-item value">{{user.initOverride}}</div>
+          {% else %}
+            <div class="grid-item value">{{user.initBonus + abilityDict["DEX"][1]}}</div>
+          {% endif %}
+
+          
+          <div class="grid-item value">{{user.profScore}}</div>
+
+        </div>
+      </div>
+    </div>
+    
+
+
+      
+    <br>
+    <!-- CONTENT -->
+    {% block content %}
+    {% endblock %}
+
+
+
+    <!-- NEUROBAR -->
+    <div class="popup" id="neurobar" aria-hidden="true" onClick="if(event.target == this){closePopup('#neurobar');}">
+      <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <a class="nav-link" href="">HOME</a>
+        <a class="nav-link" href="">BASELINE</a>
+        <a class="nav-link" href="">EQUIPMENT</a>
+        <a class="nav-link" href="">WEAPONS</a>
+        <a class="nav-link" href="">SHIP</a>
+        <a class="nav-link" href="">CYBERDECK</a>
+        <a class="nav-link" href="">LOG</a>
+        <a class="nav-link" href="">NEUROX</a>
+        <a class="nav-link" href="/auth/logout">LOGOUT</a>
+      </div>
+    </div>
+
+
+    <!-- VITALS -->
+    <div class="popup" id="vitals" aria-hidden="true" onClick="if(event.target == this){closePopup('#vitals');}">
+      <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <div class="vitalsManager">
+          <div class="vitalsSummary">
+            
+            <div class="vitalsItem">
+              <div class="vitalsItem-Label">MAX:</div>
+              {% if user.maxOverrideHP > 0 %}
+                <div class="vitalsItem-Value" id="sumMaxHP">{{user.maxOverrideHP}} ({{user.maxHP}})</div>
+              {% else %}
+                <div class="vitalsItem-Value" id="sumMaxHP">{{user.maxHP}}</div>
+              {% endif %}
+            </div>
+
+            <div class="vitalsItem"></div>
+
+            <div class="vitalsItem">
+              <div class="vitalsItem-Label">TMP:</div>
+              <input class="vitalsItem-Input" id="sumTmpHP" type="number" min="0" max="999" value={{user.tmpHP}}>
+            </div>
+
+          </div>
+
+          <div class="vitalsCurrent">
+
+            <div class="vitalsItem-Label">CURRENT: </div>
+            <div class="content-border-blue">
+              {% if user.tmpHP > 0 %}
+                <div class="vitalsItem-Value" id="sumCurrentHP">{{user.currentHP}} ({{user.tmpHP}})</div>
+              {% else %}
+                <div class="vitalsItem-Value" id="sumCurrentHP">{{user.currentHP}}</div>
+              {% endif %}
+            </div>
+
+          </div>
+
+          <div class="vitalsAdjustment">
+            
+            <button class="healButton" id="healButton">HEAL</button>
+
+            <input class="vitalsItem-Input" id="adjustHPInput" type="number" min="0" max="999" value=0>
+
+            <button class="damageButton" id="damageButton">DAMAGE</button>
+
+          </div>
+
+          <form role="form">
+            <div class="vitalsStats">
+              
+              <div class="vitalsItem-Label">BASE MAX HP:</div>
+              <input class="vitalsForm" id="maxHPInput" type="number" min="0" max="999" value={{user.maxHP}} />
+
+              <div class="vitalsItem-Label">OVERRIDE MAX HP:</div>
+              <input class="vitalsForm" id="maxOverHPInput" type="number" min="0" max="999" value={{user.maxOverrideHP}} />
+
+              <div class="vitalSubmitButtonContainer">
+                <button type="submit" class="vitalSubmitButton" id="vitalSubmitButton">SUBMIT</button>
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- AC -->
+    <div class="popup" id="AC" aria-hidden="true" onClick="if(event.target == this){closePopup('#AC');}">
+      <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <form role="form">
+          <div class="acStats">
+
+              <div> CURRENT AC = BASE AC + ABILITY</div>
+              <div class="acStatsItem">
+                  
+                  <div class="acStatsItem-Label">BASE AC:</div>
+                  <input class="acStatsItemForm" id="baseACInput" type="number" min="0" max="999" value={{user.baseAC}} />
+              
+              </div>
+
+              <div class="acStatsItem">
+                  
+                  <div class="acStatsItem-Label">ABILITY1:</div>
+                  <select class="abilityDropdown" id="ability1Dropdown">
+                    <option value="">NONE</option>
+                    <option value="STR">STR</option>
+                    <option value="DEX" selected>DEX</option>
+                    <option value="CON">CON</option>
+                    <option value="INT">INT</option>
+                    <option value="WIS">WIS</option>
+                    <option value="CHA">CHA</option>
+                  </select>
+              
+              </div>
+
+              <div class="acStatsItem">
+                  
+                <div class="infoStatsItem-Label">ABILITY2:</div>
+                <select class="abilityDropdown" id="ability2Dropdown">
+                  <option value="" selected>NONE</option>
+                  <option value="STR">STR</option>
+                  <option value="DEX">DEX</option>
+                  <option value="CON">CON</option>
+                  <option value="INT">INT</option>
+                  <option value="WIS">WIS</option>
+                  <option value="CHA">CHA</option>
+                </select>
+            
+            </div>
+
+              <div class="acStatsItem">
+                  
+                  <div class="acStatsItem-Label">OVERRIDE AC:</div>
+                  <input class="acStatsItemForm" id="overrideACInput" type="text" value={{user.overrideAC}} />
+              
+              </div>
+            
+            <div class="acSubmitButtonContainer">
+              <button type="submit" class="acSubmitButton" id="acSubmitButton">SUBMIT</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- QUICKBAR -->
+    <div class="popup" id="quickBar" aria-hidden="true" onClick="if(event.target == this){closePopup('#quickBar');}">
+      <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <form role="form">
+          <div class="quickBarSummary">
+
+              <div class="quickBarSummaryItem">
+                  <div class="quickBarSummaryDetailItem">
+                    <div>WALK SPEED:</div>
+                    <input id="walkSpeedInput" type="number" min="0" max="999" value={{user.walkingSpeed}} />
+                  </div>
+
+                  <div class="quickBarSummaryDetailItem">
+                    <div>FLY SPEED:</div>
+                    <input id="flySpeedInput" type="number" min="0" max="999" value={{user.flyingSpeed}} />
+                  </div>
+                  
+                  <div class="quickBarSummaryDetailItem">
+                    <div>SWIM SPEED:</div>
+                    <input id="swimSpeedInput" type="number" min="0" max="999" value={{user.swimmingSpeed}} />
+                  </div>
+
+                  <div class="quickBarSummaryDetailItem">
+                    <div>CLIMB SPEED:</div>
+                    <input id="climbSpeedInput" type="number" min="0" max="999" value={{user.climbingSpeed}} />
+                  </div>
+              
+              </div>
+
+              <div class="quickBarSummaryItem">
+                
+                <div class="quickBarSummaryDetailItem">
+                  <div>INIT OVERRIDE:</div>
+                  <input id="initOverrideInput" type="number" min="0" max="999" value={{user.initOverride}} />
+                </div>
+
+              </div>
+
+              <div class="quickBarSummaryItem">
+                <div class="quickBarSummaryDetailItem">
+                  <div>PROF BONUS:</div>
+                  <input id="profInput" type="number" min="0" max="999" value={{user.profScore}} />
+                </div>
+              </div>
+            
+            </div>
+
+            
+            <div class="quickBarSubmitButtonContainer">
+              <button type="submit" class="quickBarSubmitButton" id="quickBarSubmitButton">SUBMIT</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    
+
+    <div class="container-fluid">
+      <button class="navButton" id="openNeurobar" data-popup="neurobar" onClick="openPopup('#neurobar')" aria-controls="neurobar" aria-label="Open neurobar"><IMG class="neuroGif" SRC="{{ url_for('static',filename='images/midBrain.gif')}}"></button>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script 
+      type="text/javascript" 
+      src="{{ url_for('static', filename='javascript/neuronetIndex.js') }}">
+    </script>
+
+  </body>
+
+  <div class="noise"></div>
+
+
+</html>
