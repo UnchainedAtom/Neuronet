@@ -1,0 +1,100 @@
+{% extends "/neuronet/Base.html" %}
+{% block title %} HOME {% endblock %}
+{% block content %}
+<div class="container-fluid">
+
+<div class="container-fluid">
+    <div class="content-border">
+        <div class="grid-container skillsGrid" >
+
+            {% for skill in user.skills %}
+
+                <div class="skillItem" onClick="openPopup('#skill')">
+                    <div class="skillCol skillProf"> {{skill.isProficient}} </div>
+                    <div class="skillCol skillAbility"> {{skill.abilityModifier}} </div>
+                    <div class="skillCol skillName"> {{skill.name}} </div>
+                    <div class="skillCol skillMod"> {{skillDict[skill.name][0]}} </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<!-- SKill -->
+<div class="popup" id="skill" aria-hidden="true" onClick="if(event.target == this){closePopup('#skill');}">
+    <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <form role="form">
+            <div class="abilityStats">
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">STRENGTH:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="strInput" type="number" min="0" max="999" value={{user.strScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="strOverrideInput" type="number" min="0" max="999" value={{user.strOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">DEXTERITY:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="dexInput" type="number" min="0" max="999" value={{user.dexScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="dexOverrideInput" type="number" min="0" max="999" value={{user.dexOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">CONSTITUTION:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="conInput" type="number" min="0" max="999" value={{user.conScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="conOverrideInput" type="number" min="0" max="999" value={{user.conOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">INTELLIGENCE:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="intInput" type="number" min="0" max="999" value={{user.intScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="intOverrideInput" type="number" min="0" max="999" value={{user.intOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">WISDOM:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="wisInput" type="number" min="0" max="999" value={{user.wisScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="wisOverrideInput" type="number" min="0" max="999" value={{user.wisOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">CHARISMA:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="chaInput" type="number" min="0" max="999" value={{user.chaScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="chaOverrideInput" type="number" min="0" max="999" value={{user.chaOverride}} />
+                    </div>
+                </div>
+              
+
+              <div class="vitalSubmitButtonContainer">
+                <button type="submit" class="abilitySubmitButton" id="abilitySubmitButton">SUBMIT</button>
+              </div>
+
+            </div>
+          </form>
+    </div>
+</div>
+
+{% endblock %}

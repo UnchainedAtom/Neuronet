@@ -23,6 +23,17 @@ def home():
 
     return render_template("neuronet/home.html", user=current_user, roles = getAllUserRoles(), abilityDict=abilityDict, savesDict=savesDict, currentAC=currentAC)
 
+@neuroViews.route("/baseline")
+@login_required
+def baseline():
+    abilityDict = calcCurrentAbilities()
+    skillDict = calcCurrentSkills(abilityDict)
+    currentAC=calculateAC(abilityDict)
+
+
+    return render_template("neuronet/baseline.html", user=current_user, roles = getAllUserRoles(), abilityDict=abilityDict, skillDict=skillDict, currentAC=currentAC)
+
+
 #Adjusts base Max HP and override Max HP 
 @neuroViews.route("/submitVitals" , methods=['POST'])
 @login_required
@@ -198,6 +209,101 @@ def submitQuickBar():
     db.session.commit()
     return jsonify({})
 
+
+#submits ability Saves
+@neuroViews.route("/submitSaves" , methods=['POST'])
+@login_required
+def submitSaves():
+
+    #sets to 0 if below and puts into database
+    strProf = request.form['strProf']
+    strOverride =  minZero(int(request.form['strOverride']))
+    dexProf =  request.form['dexProf']
+    dexOverride =  minZero(int(request.form['dexOverride']))
+    conProf =  request.form['conProf']
+    conOverride =  minZero(int(request.form['conOverride']))
+    intProf =   request.form['intProf']
+    intOverride =  minZero(int(request.form['intOverride']))
+    wisProf =   request.form['wisProf']
+    wisOverride =  minZero(int(request.form['wisOverride']))
+    chaProf =   request.form['chaProf']
+    chaOverride =  minZero(int(request.form['chaOverride']))
+    print(strProf)
+    print(dexProf)
+
+    for save in current_user.saves:
+
+        if save.abilityModifier == 'STR':
+            if strProf == 'true':
+                save.isProficient = 1
+            else:
+                save.isProficient = 0
+
+            if strOverride > 0:
+                save.overrideSave = strOverride
+            else:
+                save.overrideSave = 0
+        
+        elif save.abilityModifier == 'DEX':
+            if dexProf == 'true':
+                save.isProficient = 1
+            else:
+                save.isProficient = 0
+
+            if dexOverride > 0:
+                save.overrideSave = dexOverride
+            else:
+                save.overrideSave = 0
+
+        elif save.abilityModifier == 'CON':
+            if conProf == 'true':
+                save.isProficient = 1
+            else:
+                save.isProficient = 0
+
+            if conOverride > 0:
+                save.overrideSave = conOverride
+            else:
+                save.overrideSave = 0
+
+        elif save.abilityModifier == 'INT':
+            if intProf == 'true':
+                save.isProficient = 1
+            else:
+                save.isProficient = 0
+
+            if intOverride > 0:
+                save.overrideSave = intOverride
+            else:
+                save.overrideSave = 0
+
+        elif save.abilityModifier == 'WIS':
+            if wisProf == 'true':
+                save.isProficient = 1
+            else:
+                save.isProficient = 0
+
+            if wisOverride > 0:
+                save.overrideSave = wisOverride
+            else:
+                save.overrideSave = 0
+
+        elif save.abilityModifier == 'CHA':
+            if chaProf == 'true':
+                save.isProficient = 1
+            else:
+                save.isProficient = 0
+
+            if chaOverride > 0:
+                save.overrideSave = chaOverride
+            else:
+                save.overrideSave = 0
+        
+
+
+    db.session.commit()
+    return jsonify({})
+
 def getAllUserRoles():
     roles = []
     for role in current_user.websiteRoles:
@@ -353,7 +459,96 @@ def calcCurrentSaves(abilityDict):
 
     return savesDict
 
-    #Calculate AC based on whether wearing armor or not
+def calcCurrentSkills(abilityDict):
+    skillsDict = {}
+
+    for skill in current_user.skills:
+        
+        #STRENGTH
+        if skill.abilityModifier == 'STR':
+            if skill.overrideSkill > 0:
+                skillMod = skill.overrideSkill
+                skillsDict[skill.name] = [skillMod, False]
+            else:
+                if skill.isProficient:
+                    skillMod = (abilityDict["STR"][1]) + skill.bonus + current_user.profScore
+                    skillsDict[skill.name] = [skillMod, True]
+                else:
+                    skillMod = (abilityDict["STR"][1]) + skill.bonus
+                    skillsDict[skill.name] = [skillMod, False]
+
+        #DEXTERITY
+        if skill.abilityModifier == 'DEX':
+            if skill.overrideSkill > 0:
+                skillMod = skill.overrideSkill
+                skillsDict[skill.name] = [skillMod, False]
+            else:
+                if skill.isProficient:
+                    skillMod = (abilityDict["DEX"][1]) + skill.bonus + current_user.profScore
+                    skillsDict[skill.name] = [skillMod, True]
+                else:
+                    skillMod = (abilityDict["DEX"][1]) + skill.bonus
+                    skillsDict[skill.name] = [skillMod, False]
+
+        #CONSTITUTION
+        if skill.abilityModifier == 'CON':
+            if skill.overrideSkill > 0:
+                skillMod = skill.overrideSkill
+                skillsDict[skill.name] = [skillMod, False]
+            else:
+                if skill.isProficient:
+                    skillMod = (abilityDict["CON"][1]) + skill.bonus + current_user.profScore
+                    skillsDict[skill.name] = [skillMod, True]
+                else:
+                    skillMod = (abilityDict["CON"][1]) + skill.bonus
+                    skillsDict[skill.name] = [skillMod, False]
+
+        #INTELIGENCE
+        if skill.abilityModifier == 'INT':
+            if skill.overrideSkill > 0:
+                skillMod = skill.overrideSkill
+                skillsDict[skill.name] = [skillMod, False]
+            else:
+                if skill.isProficient:
+                    skillMod = (abilityDict["INT"][1]) + skill.bonus + current_user.profScore
+                    skillsDict[skill.name] = [skillMod, True]
+                else:
+                    skillMod = (abilityDict["INT"][1]) + skill.bonus
+                    skillsDict[skill.name] = [skillMod, False]
+
+        
+        #WISDOM
+        if skill.abilityModifier == 'WIS':
+            if skill.overrideSkill > 0:
+                skillMod = skill.overrideSkill
+                skillsDict[skill.name] = [skillMod, False]
+            else:
+                if skill.isProficient:
+                    skillMod = (abilityDict["WIS"][1]) + skill.bonus + current_user.profScore
+                    skillsDict[skill.name] = [skillMod, True]
+                else:
+                    skillMod = (abilityDict["WIS"][1]) + skill.bonus
+                    skillsDict[skill.name] = [skillMod, False]
+
+                
+        #CHARISMA
+        if skill.abilityModifier == 'CHA':
+            if skill.overrideSkill > 0:
+                skillMod = skill.overrideSkill
+                skillsDict[skill.name] = [skillMod, False]
+            else:
+                if skill.isProficient:
+                    skillMod = (abilityDict["CHA"][1]) + skill.bonus + current_user.profScore
+                    skillsDict[skill.name] = [skillMod, True]
+                else:
+                    skillMod = (abilityDict["CHA"][1]) + skill.bonus
+                    skillsDict[skill.name] = [skillMod, False]
+        
+        
+
+    return skillsDict    
+
+#Calculate AC based on whether wearing armor or not
 def calculateAC(abilityDict):
         
     armor =  db.session.query(PlayerArmor).filter(and_(PlayerArmor.user_id==current_user.id, PlayerArmor.isEquipped==1)).first()

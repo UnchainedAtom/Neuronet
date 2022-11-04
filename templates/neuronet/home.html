@@ -215,7 +215,7 @@
             <div class="abilityStats">
 
                 <div class="abilityStatsItem">
-                    <div class="abilityStats-Label">STRENGTH:</div>
+                    <div class="abilityStats-Label blueText">STRENGTH:</div>
                     <div class="abilityStats-Value">
                         <div class="abilityStats-Value-Label">OVERRIDE:</div>
                         <input class="abilityStatsForm" id="strSaveOverrideInput" type="number" min="0" max="999" value="0" />
@@ -230,10 +230,10 @@
                 </div>
 
                 <div class="abilityStatsItem">
-                    <div class="abilityStats-Label">DEXTERITY:</div>
+                    <div class="abilityStats-Label blueText">DEXTERITY:</div>
                     <div class="abilityStats-Value">
                         <div class="abilityStats-Value-Label">OVERRIDE:</div>
-                        <input class="abilityStatsForm" id="dexOverrideInput" type="number" min="0" max="999" value= "0" />
+                        <input class="abilityStatsForm" id="dexSaveOverrideInput" type="number" min="0" max="999" value= "0" />
                     </div>
                         {% if savesDict["DEX"][1] == True %} 
                             <input type="checkbox" id="dexSaveProf" name="dexSaveProf" checked/>
@@ -245,10 +245,10 @@
                 </div>
 
                 <div class="abilityStatsItem">
-                    <div class="abilityStats-Label">CONSTITUTION:</div>
+                    <div class="abilityStats-Label blueText">CONSTITUTION:</div>
                     <div class="abilityStats-Value">
                         <div class="abilityStats-Value-Label">OVERRIDE:</div>
-                        <input class="abilityStatsForm" id="conOverrideInput" type="number" min="0" max="999" value= "0" />
+                        <input class="abilityStatsForm" id="conSaveOverrideInput" type="number" min="0" max="999" value= "0" />
                     </div>
                         {% if savesDict["CON"][1] == True %} 
                             <input type="checkbox" id="conSaveProf" name="conSaveProf" checked/>
@@ -260,10 +260,10 @@
                 </div>
 
                 <div class="abilityStatsItem">
-                    <div class="abilityStats-Label">INTELLIGENCE:</div>
+                    <div class="abilityStats-Label blueText">INTELLIGENCE:</div>
                     <div class="abilityStats-Value">
                         <div class="abilityStats-Value-Label">OVERRIDE:</div>
-                        <input class="abilityStatsForm" id="intOverrideInput" type="number" min="0" max="999" value= "0" />
+                        <input class="abilityStatsForm" id="intSaveOverrideInput" type="number" min="0" max="999" value= "0" />
                     </div>
                         {% if savesDict["INT"][1] == True %} 
                             <input type="checkbox" id="intSaveProf" name="intSaveProf" checked/>
@@ -274,11 +274,11 @@
                         {% endif %}
                 </div>
 
-                <div class="abilityStatsItem">
-                    <div class="abilityStats-Label">WISDOM:</div>
+                <div class="abilityStatsItem ">
+                    <div class="abilityStats-Label blueText">WISDOM:</div>
                     <div class="abilityStats-Value">
                         <div class="abilityStats-Value-Label">OVERRIDE:</div>
-                        <input class="abilityStatsForm" id="wisOverrideInput" type="number" min="0" max="999" value= "0" />
+                        <input class="abilityStatsForm" id="wisSaveOverrideInput" type="number" min="0" max="999" value= "0" />
                     </div>
                         {% if savesDict["WIS"][1] == True %} 
                             <input type="checkbox" id="wisSaveProf" name="wisSaveProf" checked/>
@@ -291,10 +291,10 @@
                 </div>
 
                 <div class="abilityStatsItem">
-                    <div class="abilityStats-Label">CHARISMA:</div>
+                    <div class="abilityStats-Label blueText">CHARISMA:</div>
                     <div class="abilityStats-Value">
                         <div class="abilityStats-Value-Label">OVERRIDE:</div>
-                        <input class="abilityStatsForm" id="chaOverrideInput" type="number" min="0" max="999" value= "0" />
+                        <input class="abilityStatsForm" id="chaSaveOverrideInput" type="number" min="0" max="999" value= "0" />
                     </div>
                         {% if savesDict["CHA"][1] == True %} 
                             <input type="checkbox" id="chaSaveProf" name="chaSaveProf" checked/>
@@ -307,7 +307,7 @@
               
 
               <div class="vitalSubmitButtonContainer">
-                <button type="submit" class="abilitySubmitButton" id="abilitySubmitButton">SUBMIT</button>
+                <button type="submit" class="abilitySubmitButton" id="savesSubmitButton">SUBMIT</button>
               </div>
 
             </div>

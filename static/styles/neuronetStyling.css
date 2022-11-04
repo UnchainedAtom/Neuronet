@@ -338,6 +338,45 @@ input{
   grid-template-columns: repeat(2, 1fr);
 }
 
+.skillItem{
+  align-items: center;
+  display: flex;
+  margin-bottom: 5px;
+  border-bottom: 2px solid #d33737;
+  font-size: xx-large;
+}
+
+
+
+.skillProf{
+  padding-right: 10px;
+  color: #9febea;
+  text-shadow: 0px 0px 10px #cdfffd;
+}
+
+.skillAbility{
+  padding-right: 10px;
+  
+  font-size: x-large;
+}
+
+.skillName{
+  padding-right: 10px;
+  
+}
+
+.skillMod{
+  padding-right: 10px;
+  color: #9febea;
+  text-shadow: 0px 0px 10px #cdfffd;
+}
+
+.skillCol{
+  align-items: center;
+  display: flex;
+  margin-bottom: 3px;
+}
+
 .content-border-blue{
   margin: 1px;
   border: 3px solid #93e4e2;
@@ -429,6 +468,14 @@ input{
 .quickBarSummaryItem{
   border-bottom: 2px solid #d33737 ;
   margin: 5px;
+}
+
+.blueText{
+  color: #9febea;
+  text-shadow: 0px 0px 10px #78d8d5;
+
+  color: #d94b4b;
+  text-shadow: 0px 0px 10px #df5353;
 }
 
 /*** BEGIN custom checkboxes ***/

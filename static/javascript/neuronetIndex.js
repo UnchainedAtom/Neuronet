@@ -190,6 +190,54 @@ $(function(){
 });
 
 $(function(){
+	$('#savesSubmitButton').click(function(event){
+		$.ajax({
+			data:{ 
+            strProf: $('#strSaveProf').is(":checked"),
+            strOverride: $('#strSaveOverrideInput').val(),
+            dexProf: $('#dexSaveProf').is(":checked"),
+            dexOverride: $('#dexSaveOverrideInput').val(),
+            conProf: $('#conSaveProf').is(":checked"),
+            conOverride: $('#conSaveOverrideInput').val(),
+            intProf: $('#intSaveProf').is(":checked"),
+            intOverride: $('#intSaveOverrideInput').val(),
+            wisProf: $('#wisSaveProf').is(":checked"),
+            wisOverride: $('#wisSaveOverrideInput').val(),
+            chaProf: $('#chaSaveProf').is(":checked"),
+            chaOverride: $('#chaSaveOverrideInput').val(),
+            },
+			type: 'POST',
+            url: '/submitSaves',
+        })
+        .done(function(data) {
+
+            wwindow.location.reload()
+      });
+
+      });
+});
+
+$(function(){
+	$('#infoSubmitButton').click(function(event){
+		$.ajax({
+			data:{ 
+            nameInfo: $('#nameInput').val(),
+            speciesInfo: $('#speciesInput').val(),
+            ageInfo: $('#ageInput').val(),
+            homeworldInfo: $('#homeworldInput').val(),
+            },
+			type: 'POST',
+            url: '/submitInfo',
+        })
+        .done(function(data) {
+
+            window.location.href = "/";
+      });
+
+      });
+});
+
+$(function(){
 	$('#abilitySubmitButton').click(function(event){
 		$.ajax({
 			data:{ 
@@ -208,26 +256,6 @@ $(function(){
             },
 			type: 'POST',
             url: '/submitAbilities',
-        })
-        .done(function(data) {
-
-            window.location.href = "/";
-      });
-
-      });
-});
-
-$(function(){
-	$('#infoSubmitButton').click(function(event){
-		$.ajax({
-			data:{ 
-            nameInfo: $('#nameInput').val(),
-            speciesInfo: $('#speciesInput').val(),
-            ageInfo: $('#ageInput').val(),
-            homeworldInfo: $('#homeworldInput').val(),
-            },
-			type: 'POST',
-            url: '/submitInfo',
         })
         .done(function(data) {
 
