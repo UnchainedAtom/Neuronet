@@ -2,6 +2,7 @@ from flask import Blueprint, Response, render_template, request, Response, jsoni
 from .database import db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 from sqlalchemy import func
 from scipy import stats
 import json
@@ -72,43 +73,50 @@ def myAdmin():
 @fellViews.route("/artist", methods=['GET', 'POST'])
 @login_required
 def artist():
-    #deals with artwork upload
-    if request.method == 'POST':
-        
-        artistUser = current_user
+    # Only allow users with the FELLARTIST role
+    if not hasUserRole(current_user, 'FELLARTIST'):
+        flash('You do not have permission to upload artwork.', category='error')
+        return redirect(url_for('fellViews.home'))
 
-        artImage = request.files['artImage']
+    if request.method == 'POST':
+        artImage = request.files.get('artImage')
         artName = request.form.get('artName')
         artPrice = request.form.get('artPrice')
-        print(artPrice)
 
-        #error with upload, flash and redirect back
-        if not artImage:
-            flash('UPLOAD ERROR', category='error')
+        if not artImage or not artName or not artPrice:
+            flash('All fields are required.', category='error')
             return redirect(url_for('fellViews.artist'))
 
-        if artImage and allowed_file(artImage.filename):
-            #artFilename = secure_filename(artImage.artFilename)
-            mimetype = artImage.mimetype
-
-            #makes the image to be submitted to the database
-            img = Artwork(artName=artName, artImage=artImage.read(), mimetype=mimetype, currentPrice=artPrice, artist_id=artistUser.id, owner_user_id = artistUser.id)
-            db.session.add(img)
-            db.session.commit()
-
-            flash('UPLOAD SUCCESS', category='success')
-            return redirect(url_for('fellViews.artist'))
-
-        else:
+        if not allowed_file(artImage.filename):
             flash('MUST BE PNG, JPG, JPEG, OR GIF', category='error')
             return redirect(url_for('fellViews.artist'))
 
-    #loads page for artist
-    if hasUserRole(current_user,'FELLARTIST'):
-        return render_template("fellowship/artist.html", user=current_user, roles = getAllUserRoles())
+        mimetype = artImage.mimetype
+        if not mimetype.startswith('image/'):
+            flash('Invalid file type.', category='error')
+            return redirect(url_for('fellViews.artist'))
 
-    return redirect(url_for('fellViews.home'))
+        try:
+            price = float(artPrice)
+        except ValueError:
+            flash('Invalid price.', category='error')
+            return redirect(url_for('fellViews.artist'))
 
+        img = Artwork(
+            artName=artName,
+            artImage=artImage.read(),
+            mimetype=mimetype,
+            currentPrice=price,
+            artist_id=current_user.id,
+            owner_user_id=current_user.id
+        )
+        db.session.add(img)
+        db.session.commit()
+
+        flash('UPLOAD SUCCESS', category='success')
+        return redirect(url_for('fellViews.artist'))
+
+    return render_template("fellowship/artist.html", user=current_user, roles=getAllUserRoles())
 
 # What actually gets the image
 @fellViews.route("/<int:id>")
@@ -401,3 +409,8 @@ def gen_code():
     db.session.add(addCode)
     db.session.commit()
     return jsonify({})
+
+@fellViews.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    flash('File too large. Max size is 16MB.', category='error')
+    return redirect(url_for('fellViews.artist'))

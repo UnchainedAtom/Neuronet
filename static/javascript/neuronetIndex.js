@@ -164,7 +164,7 @@ $(function(){
         .done( function(){
             window.location.reload()
       });
-        
+      event.preventDefault();
       });
 });
 
@@ -185,7 +185,7 @@ $(function(){
         .done( function(){
             window.location.reload()
       });
-        
+      event.preventDefault();
       });
 });
 
@@ -213,7 +213,7 @@ $(function(){
 
             wwindow.location.reload()
       });
-
+      event.preventDefault();
       });
 });
 
@@ -233,7 +233,7 @@ $(function(){
 
             window.location.href = "/";
       });
-
+      event.preventDefault();
       });
 });
 
@@ -261,7 +261,7 @@ $(function(){
 
             window.location.href = "/";
       });
-
+      event.preventDefault();
       });
 });
 

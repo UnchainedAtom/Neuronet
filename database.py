@@ -36,13 +36,13 @@ class User(db.Model, UserMixin):
     age = db.Column(db.Integer, default=0)
     currentCredits = db.Column(db.Float(precision=2), default=0.00)
 
-    #HP
+    #HP I think we can keep
     maxHP = db.Column(db.Integer, default=0, nullable=False)
     maxOverrideHP = db.Column(db.Integer, default=0, nullable=False)
     currentHP = db.Column(db.Integer, default=0)
     tmpHP = db.Column(db.Integer, default=0)
 
-    #ARMOR
+    #ARMOR KILL THIS
     baseAC = db.Column(db.Integer, default=0)
     acAbility1 = db.Column(db.String(3))
     acAbility2 = db.Column(db.String(3))
@@ -51,7 +51,7 @@ class User(db.Model, UserMixin):
     currentAC = db.Column(db.Integer, default=0) #Kill this one
     armor = db.relationship('PlayerArmor', backref='armorUser')
     
-    #ABILITIES
+    #ABILITIES  KILL THIS
     strScore = db.Column(db.Integer, default=0)
     strBonus = db.Column(db.Integer, default=0)
     strOverride = db.Column(db.Integer, default=0)
@@ -72,29 +72,29 @@ class User(db.Model, UserMixin):
     chaOverride = db.Column(db.Integer, default=0)
     profScore = db.Column(db.Integer, default=0)
 
-    #SAVES
+    #SAVES KILL THIS
     saves = db.relationship('PlayerAbilitySave', backref='saveUser')
 
-    #SKILLS
+    #SKILLS KILL THIS
     skills = db.relationship('PlayerSkill', backref='skillUser')
 
-    #SPEED
+    #SPEED KILL THIS
     walkingSpeed = db.Column(db.Integer, default=0)
     flyingSpeed = db.Column(db.Integer, default=0)
     swimmingSpeed = db.Column(db.Integer, default=0)
     climbingSpeed = db.Column(db.Integer, default=0)
 
-    #INITIATIVE
+    #INITIATIVE KILL THIS
     initBonus = db.Column(db.Integer, default=0)
     initOverride = db.Column(db.Integer, default=0)
 
-    #EQUIPMENT
+    #EQUIPMENT KILL THIS
     equipment = db.relationship('PlayerEquipment', backref='equipmentUser')
 
-    #WEAPONS
+    #WEAPONS MAYBE MAKE A REGISTRY
     weapons = db.relationship('PlayerWeapon', backref='weaponUser')
 
-    #SHIPS
+    #SHIPS LEANING TOWARDS KEEP
     ships = db.relationship('Ship', secondary=user_ships, backref = 'crewMember')
 
     #FELLOWSHIP
@@ -115,6 +115,7 @@ class WebsiteRole(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(30), nullable=False) 
 
+#Think we keep
 class Ship(db.Model):
     __tablename__ = 'ship'
     id = db.Column(db.Integer, primary_key=True)
@@ -158,6 +159,7 @@ class NeuroxNode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     neuroxName = db.Column(db.String(30), nullable=False)
 
+#ships are complicated, unsure if worth the effort, later addition
 class System(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ship_id = db.Column(db.Integer, db.ForeignKey('ship.id'))
@@ -165,7 +167,7 @@ class System(db.Model):
     maxHP = db.Column(db.Integer, nullable=False)
     currentHP = db.Column(db.Integer, nullable=False)
     systemDescription = db.Column(db.String(280), nullable=False)
-
+# I think bills could be fun to work our, keeps roleplay 
 class TransactionLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -173,7 +175,7 @@ class TransactionLog(db.Model):
     indexDate = db.Column(db.Integer)
     balance = db.Column(db.Float(precision=2), default=0)
     transaction = db.Column(db.Float(precision=2), default=0)
-    
+# I think bills could be fun to work our, keeps roleplay    
 class Bill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     payorId = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -192,10 +194,11 @@ class Bill(db.Model):
 
 
 
-
+#leaning towards kill
 class WeaponTemplate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
+#leaning towards kill, or registry overhaul
 class PlayerWeapon(db.Model):
     __tablename__ = 'playerweapon'
     id = db.Column(db.Integer, primary_key=True)
@@ -237,10 +240,11 @@ class PlayerWeapon(db.Model):
     attachment_id = db.Integer, db.ForeignKey('attachment.id')
     attachments = db.relationship('Attachment', backref='weapon')
 
-    
+#leaning towards kill  
 class ArmorTemplate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
+#leaning towards kill
 class PlayerArmor(db.Model):
     __tablename__ = 'playerarmor'
     id = db.Column(db.Integer, primary_key=True)
@@ -252,9 +256,11 @@ class PlayerArmor(db.Model):
     acAbility1 = db.Column(db.String(3))
     acAbility2 = db.Column(db.String(3))
 
+#leaning towards kill
 class EquipmentTemplate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
+#Unsure.  Maybe registry, leaning towards kill
 class PlayerEquipment(db.Model):
     __tablename__ = 'playerequipment'
     id = db.Column(db.Integer, primary_key=True)
@@ -263,6 +269,7 @@ class PlayerEquipment(db.Model):
     isAmmo = db.Column(db.Boolean, default=False)
     quantity = db.Column(db.Integer, default=1)
 
+#KILL this
 class PlayerSkill(db.Model):
     __tablename__ = 'playerskill'
     id = db.Column(db.Integer, primary_key=True)
@@ -273,6 +280,7 @@ class PlayerSkill(db.Model):
     overrideSkill = db.Column(db.Integer, default=0)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+#KILL this
 class PlayerAbilitySave(db.Model):
     __tablename__ = 'playerabilitysave'
     id = db.Column(db.Integer, primary_key=True)
@@ -282,6 +290,7 @@ class PlayerAbilitySave(db.Model):
     abilityModifier = db.Column(db.String(3))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+#Unsure, don't think I want weapons in here at all possibly.  Maybe just a regisrty for weapons
 class Attachment(db.Model):
     __tablename__ = 'attachments'
     id = db.Column(db.Integer, primary_key=True)

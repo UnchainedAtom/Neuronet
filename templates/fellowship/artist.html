@@ -1,7 +1,7 @@
 {% extends "fellowship/base.html" %}
 {% block title %} ARTIST {% endblock %}
 {% block content %}
-<form class="artist-form" action=" /artist" method="POST" enctype="multipart/form-data">
+<form class="artist-form" action="{{ url_for('fellViews.artist') }}" method="POST" enctype="multipart/form-data">
     <h3 align="center"> </h3>
     <div class="form-group">
         <label for = "artName"> ARTWORK NAME </label>

@@ -1,13 +1,8 @@
-from locale import currency
-from flask import Blueprint, Response, render_template, request, Response, jsonify, redirect, url_for,session, flash
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, flash
 from .database import PlayerArmor, db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
 from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
-from sqlalchemy import func, and_
-import json
-import random
+from sqlalchemy import and_
 import secrets, string
-import numpy as np
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
