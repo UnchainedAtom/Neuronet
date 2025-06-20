@@ -1,0 +1,31 @@
+{% extends "/neuronet/loginBase.html" %}
+{% block title %} LOGIN {% endblock %}
+{% block content %}
+<form method="POST">
+    <h3 align="center"> </h3>
+    <div class="form-group">
+        <label for = "userName"> USERNAME: </label>
+        <input
+            type="userName"
+            class="form-control"
+            id="userName"
+            name="userName"
+            placeholder="ENTER USERNAME"
+        />
+    </div>
+    <div class="form-group">
+        <label for = "password1"> PASSWORD: </label>
+        <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            placeholder="ENTER PASSWORD"
+        />
+    </div>
+    <br />
+    <div class="buttonDiv">
+        <button type="submit" class="btn btn-primary">&#60&#60CONNECT&#62&#62</button>
+    </div>
+</form>
+{% endblock %}

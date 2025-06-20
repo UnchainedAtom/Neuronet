@@ -1,0 +1,317 @@
+{% extends "/neuronet/Base.html" %}
+{% block title %} HOME {% endblock %}
+{% block content %}
+<div class="container-fluid">
+
+    <div class="grid-container infoGrid">
+        <div class="grid-item gridInfo" onClick="openPopup('#info')">
+            <div class="container-fluid">
+                <div class="content-border statBorder">
+                    <span>NAME: &ensp; {{ user.realName }}</span>
+                    <span>SPECIES: &ensp; {{ user.species }}</span>
+                    <span>AGE: &ensp; {{ user.age }}</span>
+                    <span>HOMEWORLD: &ensp; {{ user.homeworld }}</span>
+                    <span>CREDITS: &ensp; {{ user.currentCredits }}</span>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="grid-item gridAbility" onClick="openPopup('#abilities')">
+            <div class="container-fluid">
+                <div class="content-border statBorder">
+
+
+                    <span>STR: {{ abilityDict["STR"][0] }} &ensp; {{abilityDict["STR"][1]}} </span>
+                    <span>DEX: {{ abilityDict["DEX"][0] }} &ensp; {{abilityDict["DEX"][1]}}</span>
+                    <span>CON: {{ abilityDict["CON"][0] }} &ensp; {{abilityDict["CON"][1]}}</span>
+                    <span>INT: {{ abilityDict["INT"][0] }} &ensp; {{abilityDict["INT"][1]}}</span>
+                    <span>WIS: {{ abilityDict["WIS"][0] }} &ensp; {{abilityDict["WIS"][1]}}</span>
+                    <span>CHA: {{ abilityDict["CHA"][0] }} &ensp; {{abilityDict["CHA"][1]}}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="container-fluid">
+    <div class="content-border">
+        <div class="grid-container saveGrid" onClick="openPopup('#saves')">
+
+            <div class="grid-item gridSave">
+                <div class="content-border saveBorder">
+                    <span> {{savesDict["STR"][0]}} </span>
+                    <span> STR </span>
+                </div>
+            </div>
+
+            <div class="grid-item gridSave">
+                <div class="content-border saveBorder">
+                    <span> {{savesDict["DEX"][0]}} </span>
+                    <span> DEX </span>
+                </div>
+            </div>
+
+            <div class="grid-item gridSave">
+                <div class="content-border saveBorder">
+                    <span> {{savesDict["CON"][0]}} </span>
+                    <span> CON </span>
+                </div>
+            </div>
+
+            <div class="grid-item gridSave">
+                <div class="content-border saveBorder">
+                    <span> {{savesDict["INT"][0]}} </span>
+                    <span> INT </span>
+                </div>
+            </div>
+
+            <div class="grid-item gridSave">
+                <div class="content-border saveBorder">
+                    <span> {{savesDict["WIS"][0]}} </span>
+                    <span> WIS </span>
+                </div>
+            </div>
+
+            <div class="grid-item gridSave">
+                <div class="content-border saveBorder">
+                    <span> {{savesDict["CHA"][0]}} </span>
+                    <span> CHA </span>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<!-- INFO -->
+<div class="popup" id="info" aria-hidden="true" onClick="if(event.target == this){closePopup('#info');}">
+    <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <form role="form">
+            <div class="infoStats">
+
+                <div class="infoStatsItem">
+                    
+                    <div class="infoStatsItem-Label">NAME:</div>
+                    <input class="infoStatsItemForm" id="nameInput" type="text" value="{{user.realName}}" />
+                
+                </div>
+
+                <div class="infoStatsItem">
+                    
+                    <div class="infoStatsItem-Label">SPECIES:</div>
+                    <input class="infoStatsItemForm" id="speciesInput" type="text" value="{{user.species}}" />
+                
+                </div>
+
+                <div class="infoStatsItem">
+                    
+                    <div class="infoStatsItem-Label">AGE:</div>
+                    <input class="infoStatsItemForm" id="ageInput" type="number" min="0" max="999" value={{user.age}} />
+                
+                </div>
+
+                <div class="infoStatsItem">
+                    
+                    <div class="infoStatsItem-Label">HOMEWORLD:</div>
+                    <input class="infoStatsItemForm" id="homeworldInput" type="text" value="{{user.homeworld}}" />
+                
+                </div>
+              
+              <div class="infoSubmitButtonContainer">
+                <button type="submit" class="infoSubmitButton" id="infoSubmitButton">SUBMIT</button>
+              </div>
+
+            </div>
+          </form>
+    </div>
+</div>
+
+<!-- Abilities -->
+<div class="popup" id="abilities" aria-hidden="true" onClick="if(event.target == this){closePopup('#abilities');}">
+    <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <form role="form">
+            <div class="abilityStats">
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">STRENGTH:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="strInput" type="number" min="0" max="999" value={{user.strScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="strOverrideInput" type="number" min="0" max="999" value={{user.strOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">DEXTERITY:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="dexInput" type="number" min="0" max="999" value={{user.dexScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="dexOverrideInput" type="number" min="0" max="999" value={{user.dexOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">CONSTITUTION:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="conInput" type="number" min="0" max="999" value={{user.conScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="conOverrideInput" type="number" min="0" max="999" value={{user.conOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">INTELLIGENCE:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="intInput" type="number" min="0" max="999" value={{user.intScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="intOverrideInput" type="number" min="0" max="999" value={{user.intOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">WISDOM:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="wisInput" type="number" min="0" max="999" value={{user.wisScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="wisOverrideInput" type="number" min="0" max="999" value={{user.wisOverride}} />
+                    </div>
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label">CHARISMA:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">BASE:</div>
+                        <input class="abilityStatsForm" id="chaInput" type="number" min="0" max="999" value={{user.chaScore}} />
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="chaOverrideInput" type="number" min="0" max="999" value={{user.chaOverride}} />
+                    </div>
+                </div>
+              
+
+              <div class="vitalSubmitButtonContainer">
+                <button type="submit" class="abilitySubmitButton" id="abilitySubmitButton">SUBMIT</button>
+              </div>
+
+            </div>
+          </form>
+    </div>
+</div>
+
+<!-- Saves -->
+<div class="popup" id="saves" aria-hidden="true" onClick="if(event.target == this){closePopup('#saves');}">
+    <div class="popBorder" aria-labelledby="popupTitle" aria-describedby="popupText" aria-modal="true">
+        <form role="form">
+            <div class="abilityStats">
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label blueText">STRENGTH:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="strSaveOverrideInput" type="number" min="0" max="999" value="0" />
+                    </div>
+                        {% if savesDict["STR"][1] == True %} 
+                            <input type="checkbox" id="strSaveProf" name="strSaveProf" checked/>
+                            <label for="strSaveProf"><span></span>PROFICIENT</label>
+                        {% else %}
+                            <input type="checkbox" id="strSaveProf" name="strSaveProf"/>
+                            <label for="strSaveProf"><span></span>PROFICIENT</label>
+                        {% endif %}
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label blueText">DEXTERITY:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="dexSaveOverrideInput" type="number" min="0" max="999" value= "0" />
+                    </div>
+                        {% if savesDict["DEX"][1] == True %} 
+                            <input type="checkbox" id="dexSaveProf" name="dexSaveProf" checked/>
+                            <label for="dexSaveProf"><span></span>PROFICIENT</label>
+                        {% else %}
+                            <input type="checkbox" id="dexSaveProf" name="dexSaveProf"/>
+                            <label for="dexSaveProf"><span></span>PROFICIENT</label>
+                        {% endif %}
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label blueText">CONSTITUTION:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="conSaveOverrideInput" type="number" min="0" max="999" value= "0" />
+                    </div>
+                        {% if savesDict["CON"][1] == True %} 
+                            <input type="checkbox" id="conSaveProf" name="conSaveProf" checked/>
+                            <label for="conSaveProf"><span></span>PROFICIENT</label>
+                        {% else %}
+                            <input type="checkbox" id="conSaveProf" name="conSaveProf"/>
+                            <label for="conSaveProf"><span></span>PROFICIENT</label>
+                        {% endif %}
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label blueText">INTELLIGENCE:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="intSaveOverrideInput" type="number" min="0" max="999" value= "0" />
+                    </div>
+                        {% if savesDict["INT"][1] == True %} 
+                            <input type="checkbox" id="intSaveProf" name="intSaveProf" checked/>
+                            <label for="intSaveProf"><span></span>PROFICIENT</label>
+                        {% else %}
+                            <input type="checkbox" id="intSaveProf" name="intSaveProf"/>
+                            <label for="intSaveProf"><span></span>PROFICIENT</label>
+                        {% endif %}
+                </div>
+
+                <div class="abilityStatsItem ">
+                    <div class="abilityStats-Label blueText">WISDOM:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="wisSaveOverrideInput" type="number" min="0" max="999" value= "0" />
+                    </div>
+                        {% if savesDict["WIS"][1] == True %} 
+                            <input type="checkbox" id="wisSaveProf" name="wisSaveProf" checked/>
+                            <label for="wisSaveProf"><span></span>PROFICIENT</label>
+                        {% else %}
+                            <input type="checkbox" id="wisSaveProf" name="wisSaveProf" />
+                            <label for="wisSaveProf"><span></span>PROFICIENT</label>
+                        {% endif %}
+
+                </div>
+
+                <div class="abilityStatsItem">
+                    <div class="abilityStats-Label blueText">CHARISMA:</div>
+                    <div class="abilityStats-Value">
+                        <div class="abilityStats-Value-Label">OVERRIDE:</div>
+                        <input class="abilityStatsForm" id="chaSaveOverrideInput" type="number" min="0" max="999" value= "0" />
+                    </div>
+                        {% if savesDict["CHA"][1] == True %} 
+                            <input type="checkbox" id="chaSaveProf" name="chaSaveProf" checked/>
+                            <label for="chaSaveProf"><span></span>PROFICIENT</label>
+                        {% else %}
+                            <input type="checkbox" id="chaSaveProf" name="chaSaveProf"/>
+                            <label for="chaSaveProf"><span></span>PROFICIENT</label>
+                        {% endif %}
+                </div>
+              
+
+              <div class="vitalSubmitButtonContainer">
+                <button type="submit" class="abilitySubmitButton" id="savesSubmitButton">SUBMIT</button>
+              </div>
+
+            </div>
+          </form>
+    </div>
+</div>
+{% endblock %}
