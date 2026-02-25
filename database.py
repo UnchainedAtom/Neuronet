@@ -1,4 +1,3 @@
-from tkinter.tix import COLUMN
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from flask_migrate import Migrate
@@ -6,7 +5,6 @@ import os
 
 db = SQLAlchemy()
 DB_NAME = "AetherVoid"
-DB_PASSWORD = os.environ['MYSQL_PASSWORD']
 migrate = Migrate()
 
 user_ships = db.Table('user_ships',

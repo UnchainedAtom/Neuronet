@@ -1,5 +1,5 @@
 from flask import Blueprint, Response, render_template, request, Response, jsonify, redirect, url_for,session, flash
-from .database import db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
+from database import db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -63,7 +63,7 @@ def myAdmin():
     isAdmin = hasUserRole(current_user,'ADMIN')
     if isAdmin:
 
-        currentDate = vDate.query.get('1')
+        currentDate = vDate.query.get(1)
         return render_template("fellowship/myAdmin.html", user=current_user, roles = getAllUserRoles(), currentDate = currentDate)
 
     return redirect(url_for('fellViews.home'))
@@ -186,7 +186,7 @@ def buy_artwork():
                 artwork.forSale = False
                 
                 #Log Transaction
-                currentDate = vDate.query.get('1')
+                currentDate = vDate.query.get(1)
                 iDate = currentDate.indexDate
                 wDate = str(currentDate.day) + ':' + str(currentDate.year)
 
@@ -215,12 +215,21 @@ def buy_artwork():
 @fellViews.route("/next-day", methods=['POST'])
 @login_required
 def next_day():
-    voidDate = vDate.query.get('1')
+    voidDate = vDate.query.get(1)
     marketArt = db.session.query(Artwork).filter(Artwork.forSale == True )
     allArt = db.session.query(Artwork).all()
     artPrices = [a.currentPrice for a in db.session.query(Artwork.currentPrice)]
     artAvg = stats.trim_mean(artPrices, 0.2)
     maxArtPrice = (artAvg * 3) 
+
+    # NPC buyers for the market (simulated market activity)
+    npc_buyers = [
+        'Collector_Vex',
+        'TradeMaster_Zyn', 
+        'Investor_Kael',
+        'GalleryScan_IX',
+        'Curator_Nyx'
+    ]
 
     #Go through all artworks still for sale, and decided if they get bought
     for artwork in marketArt:
@@ -230,21 +239,24 @@ def next_day():
         buyArt=0
         currentOwner=artwork.ownerUser
         artist=artwork.artist
-        restrictedBuyers=User.query.filter(User.websiteRoles.any( role = 'PLAYER' )).all()
-        restrictedBuyers.append(currentOwner)
-        allUsers = db.session.query(User).all()
-        print(restrictedBuyers)
-        print(allUsers)
-        potentialBuyers = set(allUsers) - set(restrictedBuyers)
-        print (potentialBuyers)
-        potentialBuyers = list(potentialBuyers)
-
-        buyerListLen = (len(potentialBuyers)-1)
+        
+        # Get or create NPC buyers for market simulation
+        potentialBuyers = []
+        for npc_name in npc_buyers:
+            npc = User.query.filter_by(userName=npc_name).first()
+            if npc:
+                potentialBuyers.append(npc)
+        
+        # Don't include the current owner in potential buyers
+        potentialBuyers = [buyer for buyer in potentialBuyers if buyer.id != currentOwner.id]
+        
+        buyerListLen = len(potentialBuyers) - 1 if potentialBuyers else -1
+        
+        print(f"NPC Buyers available: {len(potentialBuyers)}")
+        print(potentialBuyers)
 
         if buyerListLen < 0:
             buyerListLen = 0
-
-        print(potentialBuyers)
 
         #Calculate artwork percent buy
         percentBuy = (((currentOwner.userRating * .05) + (artist.artistRating * .15) + (artwork.artRating * .20) + ( (random.randint(1,100)) * .25) + (100 * .35))/100)
@@ -287,7 +299,7 @@ def next_day():
                     artwork.forSale = True
 
                     #Log Transaction
-                    currentDate = vDate.query.get('1')
+                    currentDate = vDate.query.get(1)
                     iDate = currentDate.indexDate
                     wDate = str(currentDate.day) + ':' + str(currentDate.year)
 
@@ -306,10 +318,11 @@ def next_day():
     
     #Go through every artwork and log the closing prices for the day
     logPrices(allArt)
-    #db.session.commit()
+    db.session.commit()
 
     #Actual new price Calculations
     priceChange(allArt)
+    db.session.commit()
 
 
 
@@ -330,19 +343,27 @@ def next_day():
 def priceChange(allArt):
     for artwork in allArt:
         query=db.session.query(endDayLog).filter(endDayLog.art_id == artwork.id)
-        df = pd.read_sql(query.statement, query.session.bind)
-        df.sort_values('indexDate')
-        returns = np.log(1+ df['closePrice'].pct_change())
-        mu,sigma = returns.mean(), returns.std()
+        # Get the results directly instead of using pd.read_sql
+        logs = query.all()
+        
+        # Convert to DataFrame if there are logs
+        if logs:
+            df = pd.DataFrame([(log.indexDate, log.closePrice) for log in logs], columns=['indexDate', 'closePrice'])
+            df = df.sort_values('indexDate').reset_index(drop=True)
+        else:
+            df = pd.DataFrame(columns=['indexDate', 'closePrice'])
+        
+        returns = np.log(1 + df['closePrice'].pct_change())
+        mu, sigma = returns.mean(), returns.std()
 
         #accounts for new art not having any movement
-        if sigma == 0 or np.isnan(sigma)  :
-            sigma =  (random.randint(1,4)/100) + (random.random()/100)
+        if sigma == 0 or np.isnan(sigma):
+            sigma = (random.randint(1, 4) / 100) + (random.random() / 100)
         
-        if np.isnan(mu)  :
+        if np.isnan(mu):
             mu = 0
             
-        sim_rets = np.random.normal(mu,sigma,1)
+        sim_rets = np.random.normal(mu, sigma, 1)
         print(df)
         if df.empty:
             currentP = artwork.currentPrice
@@ -352,8 +373,7 @@ def priceChange(allArt):
         print(mu)
         print(artwork.artName)
         print(sim_rets)
-        print(float(currentP * (sim_rets + 1).cumprod()))
-        newPrice = float(currentP * (sim_rets + 1).cumprod())
+        newPrice = float(currentP * (sim_rets + 1).cumprod()[0])
         if newPrice < 0:
             newPrice = 0.00
         
@@ -365,7 +385,7 @@ def priceChange(allArt):
 def logPrices(allArt):
     for artwork in allArt:
         currentPrice = artwork.currentPrice
-        currentDate = vDate.query.get('1')
+        currentDate = vDate.query.get(1)
         iDate = currentDate.indexDate
         wDate = str(currentDate.day) + ':' + str(currentDate.year)
         

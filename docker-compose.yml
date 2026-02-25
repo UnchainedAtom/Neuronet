@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Flask application
+  neuronet:
+    build: .
+    container_name: neuronet-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_HOST=0.0.0.0
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-neuronet_password}
+      - MYSQL_HOST=db
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./:/app  # For development
+    networks:
+      - neuronet-network
+    restart: unless-stopped
+
+  # MySQL database
+  db:
+    image: mysql:8.0
+    container_name: neuronet-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD:-neuronet_password}
+      - MYSQL_DATABASE=AetherVoid
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - neuronet-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  neuronet-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

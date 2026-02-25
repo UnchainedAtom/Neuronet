@@ -1,0 +1,70 @@
+{% extends "/neuronet/Base.html" %}
+{% block title %} NEUROX - SUBSYSTEM HUB {% endblock %}
+{% block content %}
+<div class="container-fluid">
+
+    <div class="content-border" style="padding: 20px; text-align: center;">
+        <h2 style="margin-bottom: 30px;">NEUROX SUBSYSTEM HUB</h2>
+        <p style="margin-bottom: 30px; font-size: 0.9em;">GATEWAY TO ALL NEUROXNODE SYSTEMS</p>
+    </div>
+
+    <!-- Subsystems Grid -->
+    <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px;">
+        
+        <!-- Fellowship Market -->
+        <div class="content-border" style="padding: 20px; cursor: pointer; transition: all 0.3s ease;" 
+             onmouseover="this.style.boxShadow='0 0 10px rgba(255,100,0,0.5)'" 
+             onmouseout="this.style.boxShadow='none'"
+             onclick="window.location.href='/fellowship/'">
+            <h4 style="margin-top: 0; color: #ff6400;">FELLOWSHIP</h4>
+            <p style="font-size: 0.85em; margin: 10px 0;">
+                Access the Fellowship Market. Browse and trade artwork in the Void economy.
+            </p>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,100,0,0.3);">
+                <small>→ ENTER SUBSYSTEM</small>
+            </div>
+        </div>
+
+        <!-- Placeholder for future subsystems -->
+        <div class="content-border" style="padding: 20px; opacity: 0.5; cursor: not-allowed;">
+            <h4 style="margin-top: 0; color: #666;">MARKET</h4>
+            <p style="font-size: 0.85em; margin: 10px 0;">
+                [OFFLINE] General marketplace and trading hub. Coming soon.
+            </p>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(100,100,100,0.3);">
+                <small>→ UNAVAILABLE</small>
+            </div>
+        </div>
+
+        <div class="content-border" style="padding: 20px; opacity: 0.5; cursor: not-allowed;">
+            <h4 style="margin-top: 0; color: #666;">COMMUNICATIONS</h4>
+            <p style="font-size: 0.85em; margin: 10px 0;">
+                [OFFLINE] Connect with other users. Coming soon.
+            </p>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(100,100,100,0.3);">
+                <small>→ UNAVAILABLE</small>
+            </div>
+        </div>
+
+        <div class="content-border" style="padding: 20px; opacity: 0.5; cursor: not-allowed;">
+            <h4 style="margin-top: 0; color: #666;">INFO NET</h4>
+            <p style="font-size: 0.85em; margin: 10px 0;">
+                [OFFLINE] Access information networks. Coming soon.
+            </p>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(100,100,100,0.3);">
+                <small>→ UNAVAILABLE</small>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .grid-container {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+{% endblock %}

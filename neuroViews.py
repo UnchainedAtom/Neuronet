@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, flash
-from .database import PlayerArmor, db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
+from database import PlayerArmor, db, User, Artwork, endDayLog, vDate, AccessCode, TransactionLog
 from flask_login import login_required, current_user
 from sqlalchemy import and_
 import secrets, string
@@ -27,6 +27,12 @@ def baseline():
 
 
     return render_template("neuronet/baseline.html", user=current_user, roles = getAllUserRoles(), abilityDict=abilityDict, skillDict=skillDict, currentAC=currentAC)
+
+@neuroViews.route("/neurox")
+@login_required
+def neurox():
+    """Neurox hub page - gateway to all subsystems"""
+    return render_template("neuronet/neurox.html", user=current_user, roles=getAllUserRoles())
 
 
 #Adjusts base Max HP and override Max HP 

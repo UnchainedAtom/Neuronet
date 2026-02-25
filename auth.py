@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for,session, flash
-from .database import db, User, AccessCode, PlayerAbilitySave, PlayerSkill
+from database import db, User, AccessCode, PlayerAbilitySave, PlayerSkill, WebsiteRole
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 
@@ -62,11 +62,26 @@ def signUp():
         elif len(password1) < 8:
             flash('PASSWORD MUST BE AT LEAST 8 CHARACTERS.', category='error')
         else:
-            new_user = User(userName=userName, password=generate_password_hash(password1, method='sha256'))
+            new_user = User(userName=userName, password=generate_password_hash(password1))
             #get code that was matched, so we can delete it 
             matchCode = AccessCode.query.filter_by(code=code).first()
             db.session.add(new_user)
             db.session.commit()
+            
+            # Assign role based on access code
+            if code.upper() == 'ADMIN-001':
+                admin_role = WebsiteRole.query.filter_by(role='ADMIN').first()
+                fellartist_role = WebsiteRole.query.filter_by(role='FELLARTIST').first()
+                if admin_role:
+                    new_user.websiteRoles.append(admin_role)
+                if fellartist_role:
+                    new_user.websiteRoles.append(fellartist_role)
+            else:
+                # Assign FELLARTIST role by default for regular users
+                fellartist_role = WebsiteRole.query.filter_by(role='FELLARTIST').first()
+                if fellartist_role:
+                    new_user.websiteRoles.append(fellartist_role)
+            
             login_user(new_user, remember=True)
             createStats(new_user)
             current_user.baseAC = 10

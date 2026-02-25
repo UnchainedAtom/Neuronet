@@ -2,28 +2,22 @@ from unicodedata import name
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
-from .database import Bill, NeuroxNode, Ship, System, TransactionLog, WebsiteRole, db, AccessCode, DB_PASSWORD, User, Artwork, vDate, endDayLog, migrate
-from .fellViews import fellViews, hasUserRole
-from .neuroViews import neuroViews
-from .auth import auth
+from database import Bill, NeuroxNode, Ship, System, TransactionLog, WebsiteRole, db, AccessCode, User, Artwork, vDate, endDayLog, migrate
+from fellViews import fellViews, hasUserRole
+from neuroViews import neuroViews
+from auth import auth
 from os import abort, path
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from urllib.parse import quote  
+from config import current_config
 
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key=('nonprod')
-
-    #OLD SQLlite DATABASE
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME
-    #NEW MySql
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/AetherVoid' % quote(DB_PASSWORD)
-
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.permanent_session_lifetime = timedelta(days=1)
+    
+    # Load configuration from config.py
+    app.config.from_object(current_config)
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -51,16 +45,26 @@ def create_app():
         #INJECTING DATE
     @app.context_processor
     def inject_now():
-        avDate = vDate.query.get('1')
-        formatDate = str(avDate.day) + ':' + str(avDate.year)
+        try:
+            avDate = vDate.query.get(1)
+            if avDate:
+                formatDate = str(avDate.day) + ':' + str(avDate.year)
+            else:
+                formatDate = "0:0"  # Default if no date exists
+        except:
+            formatDate = "0:0"  # Default on any error
         return dict(formatDate=formatDate)
 
     return app
 
 def create_database(app):
-    #if not path.exists(DB_NAME):
-    db.create_all(app=app)
-    print('CREATED DATABASE')
+    """Create database tables if they don't exist"""
+    try:
+        with app.app_context():
+            db.create_all()
+    except Exception as e:
+        print(f"Warning: Could not create database tables: {e}")
+        print("If this is your first run, please run: python init_db.py")
 
 
 

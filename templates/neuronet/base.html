@@ -90,10 +90,14 @@
 
           <div class="grid-item value">{{user.walkingSpeed}}</div>
 
-          {% if user.initOverride > 0 %}
-            <div class="grid-item value">{{user.initOverride}}</div>
+          {% if abilityDict is defined %}
+            {% if user.initOverride > 0 %}
+              <div class="grid-item value">{{user.initOverride}}</div>
+            {% else %}
+              <div class="grid-item value">{{user.initBonus + abilityDict["DEX"][1]}}</div>
+            {% endif %}
           {% else %}
-            <div class="grid-item value">{{user.initBonus + abilityDict["DEX"][1]}}</div>
+            <div class="grid-item value">--</div>
           {% endif %}
 
           
@@ -123,7 +127,7 @@
         <a class="nav-link" href="">SHIP</a>
         <a class="nav-link" href="">CYBERDECK</a>
         <a class="nav-link" href="">LOG</a>
-        <a class="nav-link" href="">NEUROX</a>
+        <a class="nav-link" href="/neurox">NEUROX</a>
         <a class="nav-link" href="/auth/logout">LOGOUT</a>
       </div>
     </div>
