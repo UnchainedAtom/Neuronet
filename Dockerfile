@@ -38,9 +38,9 @@ ENV PATH=/root/.local/bin:$PATH \
 # Expose port
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:5000/auth/login')" || exit 1
+# Health check - simple python check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
+    CMD python -c "import socket; socket.create_connection(('127.0.0.1', 5000), timeout=2)" || exit 1
 
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "60", "wsgi:app"]
+# Run the application - initialize DB then start server
+CMD ["/bin/bash", "-c", "python init_db.py && gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 60 wsgi:app"]

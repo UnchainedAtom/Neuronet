@@ -12,12 +12,13 @@ services:
       - FLASK_HOST=0.0.0.0
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-neuronet_password}
       - MYSQL_HOST=db
+      - MYSQL_DATABASE=AetherVoid
       - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./:/app  # For development
+      - ./:/app
     networks:
       - neuronet-network
     restart: unless-stopped

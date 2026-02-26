@@ -1,251 +1,168 @@
-# Neuronet - In-Game Economy Trading Platform
+# Neuronet
 
-A Flask-based web application that simulates an internet within a sci-fi D&D game setting. Players can trade artwork (NFT-like assets) in the "Fellowship" market and manage character statistics through the "Neuronet" system.
+A sci-fi marketplace sim built with Flask where players trade digital art in an in-game economy. It combines character stat management (D&D 5e style) with a dynamic NFT-like trading system. Think "space barter meets tabletop RPG meets online marketplace."
 
-## Features
+## What's in here
 
-- **User Authentication**: Secure login and signup with access code verification
-- **Fellowship Market**: Buy and sell artwork with dynamic pricing
-- **Neuronet System**: Character stat management (D&D 5e inspired)
-- **Admin Panel**: Manage users, artworks, and game data
-- **Role-Based Access**: Support for different user roles (Admin, Artist, etc.)
-- **Database Flexibility**: Supports both SQLite (development) and MySQL (production)
+- **Character System**: Create a character, roll stats, manage abilities like in D&D
+- **Fellowship Market**: Buy/sell digital artwork with prices that shift based on NPC trading
+- **Secure Auth**: Access codes, role-based permissions, proper password handling
+- **Admin Tools**: Manage players, artworks, game progression
+- **Database Flexibility**: Works with SQLite locally, MySQL in production (zero fuss setup)
+- **Docker Support**: Containerized for easy deployment
 
-## Project Structure
+## Project structure
 
 ```
-├── app.py                 # Application entry point
-├── init_db.py            # Database initialization script
-├── wsgi.py              # Production WSGI entry point
-├── requirements.txt       # Python dependencies
-├── config.py             # Configuration management
-├── __init__.py           # Flask app factory
-├── auth.py              # Authentication routes
-├── neuroViews.py        # Neuronet character system
-├── fellViews.py         # Fellowship market system
-├── database.py          # SQLAlchemy models
-├── migrations/          # Alembic database migrations
-├── Dockerfile           # Container image definition
-├── docker-compose.yml   # Multi-container orchestration
-├── templates/           # HTML templates
-│   ├── neuronet/       # Neuronet UI templates
-│   └── fellowship/     # Fellowship market templates
-└── static/             # CSS and JavaScript
-    ├── styles/
-    └── javascript/
+├── app.py              # Entry point (dev server)
+├── wsgi.py            # Entry point (production)
+├── __init__.py        # Flask app factory & blueprints
+├── auth.py            # Login/signup logic
+├── neuroViews.py      # Character system
+├── fellViews.py       # Market system
+├── database.py        # SQLAlchemy models
+├── config.py          # Environment/config handling
+├── init_db.py         # Database setup script
+├── requirements.txt   # Python dependencies
+├── Dockerfile         # Container definition
+├── docker-compose.yml # Multi-container setup
+├── templates/         # HTML templates
+│   ├── neuronet/     # Character UI
+│   └── fellowship/   # Market UI
+└── static/           # CSS, JS, images
 ```
 
-## Quick Start
+## Getting started
 
-### Prerequisites
+You need Python 3.8+ and pip. That's it.
 
-- Python 3.8+
-- pip (Python package manager)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   cd Neuronet
-   ```
-
-2. **Create a virtual environment**
-   ```bash
-   # Windows
-   python -m venv venv
-   venv\Scripts\activate
-
-   # macOS/Linux
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables** (optional, uses SQLite by default)
-   ```bash
-   # Copy the example file
-   cp .env.example .env
-   
-   # Edit .env with your settings (optional for development)
-   ```
-
-5. **Initialize the database**
-   ```bash
-   python init_db.py
-   ```
-   This creates default tables, roles, and demo access codes.
-
-6. **Access the application**
-   - Open your browser to `http://localhost:5000`
-   - Default access: Login page (need to create account with access code)
-
-## Development vs Production
-
-### Development (Default)
-
-Uses SQLite database for easy local development with no setup required.
-
+**On Windows:**
 ```bash
-FLASK_ENV=development python app.py
-```
-
-### Production (MySQL)
-
-For production deployment, configure MySQL:
-
-1. **Set environment variables**:
-   ```bash
-   export FLASK_ENV=production
-   export MYSQL_PASSWORD=your_password
-   export MYSQL_HOST=your_host
-   export SECRET_KEY=your-secure-key
-   ```
-
-2. **Initialize the database**:
-   ```bash
-   python init_db.py
-   ```
-
-3. **Run the application**:
-   ```bash
-   python app.py
-   ```
-
-## Database Initialization
-
-### Quick Setup
-```bash
+git clone https://github.com/UnchainedAtom/Neuronet
+cd Neuronet
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
 python init_db.py
+python app.py
 ```
 
-This creates:
-- Database tables from SQLAlchemy models
-- Game date (Aether Date 108:1907)
-- User roles (ADMIN, FELLARTIST, USER)
-- Demo access codes (DEMO-001/002/003, ADMIN-001)
-- NPC market participants (5 traders with starting credits)
-
-### Database Selection
-- **Development (Default)**: Uses SQLite, automatically created
-- **Production**: Uses MySQL when `MYSQL_PASSWORD` environment variable is set
-
-## Database Migrations
-
-After schema changes, run:
+**On Mac/Linux:**
 ```bash
-flask db migrate -m "Description of changes"
-flask db upgrade
+git clone https://github.com/UnchainedAtom/Neuronet
+cd Neuronet
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python init_db.py
+python app.py
 ```
 
-## Features Overview
+Then open http://localhost:5000. You'll get a login screen. Use one of the demo codes:
+- `DEMO-001`, `DEMO-002`, `DEMO-003` - Regular player accounts
+- `ADMIN-001` - Admin account (gets access to /admin)
 
-### Neuronet System
-- Character creation and management
-- D&D 5e-inspired ability scores and saves
-- Skill tracking
-- Equipment management
-- Ship ownership and crew management
+Obviously change these if you're deploying anywhere public.
 
-### Fellowship Market
-- Artist registration for art uploads
-- Artwork marketplace with pricing
-- Buy/sell transactions
-- Inventory management
-- Sales history and analytics
+## Running it
 
-### Admin Panel
-- User management
-- Artwork moderation
-- Game-wide statistics
-- Date/game-time management
-- Transaction logs
+**Development (default):**
+```bash
+python app.py
+```
+Uses SQLite, no extra setup needed.
 
-## Security Considerations
+**Production (if you know what you're doing):**
+Set environment variables for MySQL and run with Gunicorn:
+```bash
+export FLASK_ENV=production
+export MYSQL_PASSWORD=your_password
+export SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+gunicorn --bind 0.0.0.0:8000 wsgi:app
+```
 
-⚠️  **Before deploying to production:**
+**With Docker:**
+```bash
+docker-compose up -d
+```
+Waits ~30 seconds for MySQL to start, then you're good to go.
 
-1. **Change the SECRET_KEY**
+## How it works
+
+### Database
+
+Run `python init_db.py` once to set up everything:
+- Creates tables for users, artworks, character stats, etc.
+- Sets game date to Aether 108:1907
+- Adds 5 NPC traders who buy/sell on their own
+- Creates the demo access codes above
+
+Uses SQLite by default (lives in `neuronet.db`). Want MySQL? Set `MYSQL_PASSWORD` as an env var and it'll auto-switch.
+
+### The Neuronet character dashboard
+
+After login, you see your character stats (STR, DEX, CON, INT, WIS, CHA) and can tweak things like AC, HP, and bonuses. Straight out of D&D 5e.
+
+### The Fellowship market
+
+Upload artwork, browse what others made, buy/sell pieces. The market's dynamic—NPCs make their own trades, so prices shift based on what's happening.
+
+### Admin panel
+
+If you log in with `ADMIN-001`, you get `/admin` with tools to manage users, see game stats, progress the day/year, and eyeball transaction logs.
+
+## Security stuff
+
+If you're deploying this live:
+
+1. **Generate a real SECRET_KEY:**
    ```bash
    python -c "import secrets; print(secrets.token_hex(32))"
    ```
-   Set this value in your `.env` or environment variables
+   Put it in your `.env` or environment before launching.
 
-2. **Use HTTPS** with a proper SSL certificate
+2. **Use HTTPS.** Always.
 
-3. **Configure CORS** headers appropriately
+3. **Lock down environment variables.** Never push `.env` files or API keys to GitHub.
 
-4. **Use environment variables** for all sensitive data (never hardcode credentials)
+4. **Change (or remove) the demo access codes** before going public.
 
-5. **Implement rate limiting** on authentication endpoints
+See [SECURITY.md](SECURITY.md) for more details on what got fixed.
 
-6. **Regular backups** of database
+## Routes
 
-## API Usage
-
-The application provides web pages rather than traditional REST APIs. Interactions happen through form submissions and JSON endpoints.
-
-### Key Routes
-
-- `/auth/login` - User login
-- `/auth/signUp` - User registration
-- `/` - Neuronet home (character dashboard)
-- `/fellowship/` - Fellowship market
-- `/fellowship/market` - Browse artworks
-- `/fellowship/inventory` - User's owned items
-- `/fellowship/artist` - Upload artwork (if artist role)
-- `/admin` - Admin dashboard (admin role required)
+- `/auth/login` - Sign in here
+- `/auth/signUp` - Make an account with an access code
+- `/` - Your character dashboard (Neuronet home)
+- `/baseline` - Detailed character sheet
+- `/neurox` - System hub (gateway to subsystems)
+- `/fellowship/` - Market home page
+- `/fellowship/inventory` - Your items
+- `/fellowship/artist` - Upload art (if you have artist role)
+- `/admin` - Management tools (ADMIN-001 only)
 
 ## Troubleshooting
 
-### "Cannot import neuronet" error
-Make sure you're in the correct directory and the virtual environment is activated.
+**The database file got corrupted?**
+Delete `neuronet.db` and run `python init_db.py` again.
 
-### Database connection errors
-For development: No action needed, SQLite is auto-created
-For production: Verify MySQL is running and `MYSQL_PASSWORD` is set
+**Getting import errors?**
+Make sure your virtual environment is activated and you've run `pip install -r requirements.txt`.
 
-### Port already in use
+**Port 5000 in use?**
 ```bash
 PORT=5001 python app.py
 ```
 
-### Module not found errors
-```bash
-pip install -r requirements.txt
-```
+**MySQL connection failing?**
+Make sure MySQL is running and `MYSQL_PASSWORD` is set. For local dev, just delete `neuronet.db` and use SQLite (the default).
 
-## Contributing
+**Weird jinja2 errors?**
+Refresh the page or clear your browser cache. Flask in debug mode sometimes gets finicky.
 
-This is a portfolio project. For modifications or improvements:
-1. Create a feature branch
-2. Make changes
-3. Test locally
-4. Submit a pull request
+## Next steps
 
-## License
-
-Private project - for portfolio use
-
-## Future Improvements
-
-- [ ] REST API endpoints
-- [ ] WebSocket support for real-time updates
-- [ ] Enhanced analytics dashboard
-- [ ] Mobile-responsive UI overhaul
-- [ ] Docker containerization
-- [ ] Kubernetes deployment configs
-- [ ] CI/CD pipeline
-- [ ] Automated testing suite
-
-## Contact & Support
-
-This is a portfolio project by UnchainedAtom. For questions or issues, refer to the GitHub repository.
-
----
-
-**Last Updated**: February 2026
-**Status**: Portfolio Ready
+Want to extend this? Look at:
+- [SETUP.md](SETUP.md) - Installation & deployment guides
+- [SECURITY.md](SECURITY.md) - What vulnerabilities got fixed
+- [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Full feature list & DevOps stuff

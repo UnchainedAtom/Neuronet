@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
 
     #INFO
     userName = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150))
+    password = db.Column(db.String(255))
     realName = db.Column(db.String(50))
     homeworld = db.Column(db.String(50))
     species = db.Column(db.String(50))
@@ -126,8 +126,8 @@ class Ship(db.Model):
 class Artwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     artName = db.Column(db.String(150), nullable=False)
-    artImage = db.Column(db.Text, nullable=False)
-    mimetype = db.Column(db.Text, nullable=False)
+    artImage = db.Column(db.LargeBinary(length=16777215), nullable=False)  # MEDIUMBLOB: 16MB
+    mimetype = db.Column(db.String(50), nullable=False)
     artRating = db.Column(db.Float(precision=2), default=0)
     purchasePrice = db.Column(db.Float(precision=2), default=0)
     currentPrice = db.Column(db.Float(precision=2), default=0)
